@@ -7,11 +7,17 @@
 #include <QJsonDocument>
 #include <QTextStream>
 
-class Settings : public QObject
+class SingletonSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit Settings(QObject *parent = nullptr);
+
+    static SingletonSettings & instance()
+    {
+        static SingletonSettings s;
+
+        return s;
+    }
 
     void loadSettings(QString const & pathToLoad);
 
@@ -38,6 +44,12 @@ signals:
 public slots:
 
 private:
+
+    explicit SingletonSettings(QObject *parent = nullptr);
+
+    SingletonSettings(SingletonSettings const &);
+
+    SingletonSettings & operator=(SingletonSettings const &);
 
     QString parseDataToJSON();
 

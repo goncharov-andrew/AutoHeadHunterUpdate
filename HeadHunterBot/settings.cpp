@@ -1,6 +1,6 @@
 #include "settings.h"
 
-Settings::Settings(QObject *parent) : QObject(parent)
+SingletonSettings::SingletonSettings(QObject *parent) : QObject(parent)
 {
      mIDResume = "";
      mHhtoken = "";
@@ -8,7 +8,7 @@ Settings::Settings(QObject *parent) : QObject(parent)
      mXsrf = "";
 }
 
-QString Settings::parseDataToJSON()
+QString SingletonSettings::parseDataToJSON()
 {
     QJsonObject jsonObj;
     jsonObj["IDResume"] = this->mIDResume;
@@ -23,7 +23,7 @@ QString Settings::parseDataToJSON()
     return result;
 }
 
-void Settings::parseDataFromJSON(QString const & data)
+void SingletonSettings::parseDataFromJSON(QString const & data)
 {
     QJsonDocument document = QJsonDocument::fromJson(data.toUtf8());
 
@@ -34,7 +34,7 @@ void Settings::parseDataFromJSON(QString const & data)
     this->mXsrf = jsonObj["Xsrf"].toString();
 }
 
-void Settings::loadSettings(QString const & pathToLoad)
+void SingletonSettings::loadSettings(QString const & pathToLoad)
 {
     QString result = "";
     QString temp = "";
@@ -55,7 +55,7 @@ void Settings::loadSettings(QString const & pathToLoad)
     parseDataFromJSON(result);
 }
 
-void Settings::saveSettings(QString const & pathToSave)
+void SingletonSettings::saveSettings(QString const & pathToSave)
 {
     QString result = parseDataToJSON();
 
@@ -70,42 +70,42 @@ void Settings::saveSettings(QString const & pathToSave)
     file.close();
 }
 
-QString const & Settings::getIDResume()
+QString const & SingletonSettings::getIDResume()
 {
     return this->mIDResume;
 }
 
-QString const & Settings::getHhtoken()
+QString const & SingletonSettings::getHhtoken()
 {
     return this->mHhtoken;
 }
 
-QString const & Settings::getHhuid()
+QString const & SingletonSettings::getHhuid()
 {
     return this->mHhuid;
 }
 
-QString const & Settings::getXsrf()
+QString const & SingletonSettings::getXsrf()
 {
     return this->mXsrf;
 }
 
-void Settings::setIDResume(QString const & data)
+void SingletonSettings::setIDResume(QString const & data)
 {
     this->mIDResume = data;
 }
 
-void Settings::setHhtoken(QString const & data)
+void SingletonSettings::setHhtoken(QString const & data)
 {
     this->mHhtoken = data;
 }
 
-void Settings::setHhuid(QString const & data)
+void SingletonSettings::setHhuid(QString const & data)
 {
     this->mHhuid = data;
 }
 
-void Settings::setXsrf(QString const & data)
+void SingletonSettings::setXsrf(QString const & data)
 {
     this->mXsrf = data;
 }

@@ -4,7 +4,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    settings(new Settings),
     manager(new QNetworkAccessManager),
     tmr(new QTimer)
 {
@@ -23,8 +22,6 @@ MainWindow::~MainWindow()
 
     delete manager;
 
-    delete settings;
-
     delete tmr;
 }
 
@@ -34,12 +31,12 @@ void MainWindow::on_pushButtonLoadSettings_clicked()
                                                     tr("Settings (*.json);;All Files (*)"));
     if("" != fileName)
     {
-        settings->loadSettings(fileName);
+        SingletonSettings::instance().loadSettings(fileName);
 
-        ui->lineEditIDResume->setText(settings->getIDResume());
-        ui->lineEditHhtoken->setText(settings->getHhtoken());
-        ui->lineEditHhid->setText(settings->getHhuid());
-        ui->lineEditXsrf->setText(settings->getXsrf());
+        ui->lineEditIDResume->setText(SingletonSettings::instance().getIDResume());
+        ui->lineEditHhtoken->setText(SingletonSettings::instance().getHhtoken());
+        ui->lineEditHhid->setText(SingletonSettings::instance().getHhuid());
+        ui->lineEditXsrf->setText(SingletonSettings::instance().getXsrf());
     }
 }
 
@@ -51,7 +48,7 @@ void MainWindow::on_pushButtonSaveSettings_clicked()
     {
         setSettings();
 
-        settings->saveSettings(fileName);
+        SingletonSettings::instance().saveSettings(fileName);
     }
 }
 
@@ -102,10 +99,10 @@ void MainWindow::on_requestOnTimer()
 
 void MainWindow::setSettings()
 {
-    settings->setIDResume(ui->lineEditIDResume->text());
-    settings->setHhtoken(ui->lineEditHhtoken->text());
-    settings->setHhuid(ui->lineEditHhid->text());
-    settings->setXsrf(ui->lineEditXsrf->text());
+    SingletonSettings::instance().setIDResume(ui->lineEditIDResume->text());
+    SingletonSettings::instance().setHhtoken(ui->lineEditHhtoken->text());
+    SingletonSettings::instance().setHhuid(ui->lineEditHhid->text());
+    SingletonSettings::instance().setXsrf(ui->lineEditXsrf->text());
 }
 
 void MainWindow::sendRequest()
@@ -116,14 +113,14 @@ void MainWindow::sendRequest()
 
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=UTF-8");
 
-    request.setRawHeader("X-Xsrftoken", settings->getXsrf().toUtf8());
+    request.setRawHeader("X-Xsrftoken", SingletonSettings::instance().getXsrf().toUtf8());
 
-    request.setRawHeader("Cookie", "hhtoken=" + settings->getHhtoken().toUtf8() + "; " +
-                                   "hhuid=" + settings->getHhuid().toUtf8() + "; " +
-                                   "_xsrf=" + settings->getXsrf().toUtf8() + "; "
+    request.setRawHeader("Cookie", "hhtoken=" + SingletonSettings::instance().getHhtoken().toUtf8() + "; " +
+                                   "hhuid=" + SingletonSettings::instance().getHhuid().toUtf8() + "; " +
+                                   "_xsrf=" + SingletonSettings::instance().getXsrf().toUtf8() + "; "
                          );
 
-    QByteArray postData = "resume=" + settings->getIDResume().toUtf8() +
+    QByteArray postData = "resume=" + SingletonSettings::instance().getIDResume().toUtf8() +
                           "&undirectable=" + "true";
 
     manager->post(request, postData);

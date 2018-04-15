@@ -45,8 +45,6 @@ private:
 
     Ui::MainWindow *ui;
 
-    Settings *settings;
-
     QNetworkAccessManager *manager;
 
     QTimer *tmr;
