@@ -8,6 +8,8 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QTime>
+#include <QSystemTrayIcon>
+#include <QCloseEvent>
 #include "settings.h"
 
 namespace Ui {
@@ -22,6 +24,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
+
+    void closeEvent(QCloseEvent * event);
+
 private slots:
     void on_pushButtonLoadSettings_clicked();
 
@@ -29,13 +35,15 @@ private slots:
 
     void on_pushButtonUpdateResume_clicked();
 
-    void on_responseFromServer(QNetworkReply *reply);
-
-    void on_requestOnTimer();
-
     void on_pushButtonStartAutoUpdateResume_clicked();
 
     void on_pushButtonStopAutoUpdateResume_clicked();
+
+    void on_iconActivated(QSystemTrayIcon::ActivationReason reason);
+
+    void on_responseFromServer(QNetworkReply *reply);
+
+    void on_requestOnTimer();
 
 private:
 
@@ -43,11 +51,19 @@ private:
 
     void sendRequest();
 
-    Ui::MainWindow *ui;
+    Ui::MainWindow        *ui;
 
     QNetworkAccessManager *manager;
 
-    QTimer *tmr;
+    QSystemTrayIcon       *trayIcon;
+
+    QMenu                 *trayMenu;
+
+    QAction               *viewWindow;
+
+    QAction               *quitAction;
+
+    QTimer                *tmr;
 };
 
 #endif // MAINWINDOW_H

@@ -5,24 +5,56 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     manager(new QNetworkAccessManager),
-    tmr(new QTimer)
+    tmr(new QTimer),
+    trayMenu(new QMenu(this)),
+    trayIcon(new QSystemTrayIcon(this)),
+    viewWindow(new QAction("View window", this)),
+    quitAction(new QAction("Exit", this))
 {
     ui->setupUi(this);
 
     tmr->setInterval(14400000);// 4 hour
 
-    connect( manager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( on_responseFromServer( QNetworkReply* ) ) );
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(on_responseFromServer(QNetworkReply*)));
 
-    connect(tmr, SIGNAL( timeout() ), this, SLOT( on_requestOnTimer() ) );
+    connect(tmr, SIGNAL(timeout()), this, SLOT(on_requestOnTimer()));
+
+    connect(viewWindow, SIGNAL(triggered()), this, SLOT(show()));
+    connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
+
+    trayMenu->addAction(viewWindow);
+    trayMenu->addAction(quitAction);
+
+    trayIcon->setIcon(this->style()->standardIcon(QStyle::SP_ComputerIcon));
+    trayIcon->setToolTip("HeadHunterBot");
+    trayIcon->setContextMenu(trayMenu);
+    trayIcon->show();
+
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+                this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-
     delete manager;
-
     delete tmr;
+    delete trayIcon;
+    delete trayMenu;
+    delete viewWindow;
+    delete quitAction;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if(this->isVisible())
+    {
+        event->ignore();
+        this->hide();
+
+        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon(QSystemTrayIcon::Information);
+        trayIcon->showMessage("Tray Program", "", icon, 2000);
+    }
 }
 
 void MainWindow::on_pushButtonLoadSettings_clicked()
@@ -95,6 +127,25 @@ void MainWindow::on_responseFromServer(QNetworkReply* reply)
 void MainWindow::on_requestOnTimer()
 {
     sendRequest();
+}
+
+void MainWindow::on_iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason)
+    {
+    case QSystemTrayIcon::Trigger:
+        if(false == this->isVisible())
+        {
+            this->show();
+        }
+        else
+        {
+            this->hide();
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void MainWindow::setSettings()
